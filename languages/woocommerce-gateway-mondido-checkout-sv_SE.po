@@ -1,0 +1,199 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2018-06-08 13:28+0600\n"
+"PO-Revision-Date: 2018-06-08 13:29+0600\n"
+"Last-Translator: aait <info@aait.se>\n"
+"Language-Team: \n"
+"Language: sv_SE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.8.7.1\n"
+"X-Poedit-Basepath: .\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-KeywordsList: __;_e;_e(sprintf\n"
+"X-Poedit-SearchPath-0: ..\n"
+
+#: ../includes/class-wc-gateway-mondido-checkout.php:79
+#: ../includes/class-wc-gateway-mondido-checkout.php:99
+#: ../includes/class-wc-gateway-mondido-checkout.php:198
+msgid "Mondido Checkout"
+msgstr ""
+
+#: ../includes/class-wc-gateway-mondido-checkout.php:109
+#: ../includes/class-wc-gateway-mondido-checkout.php:273
+msgid "Pay with Mondido"
+msgstr ""
+
+#: ../includes/class-wc-gateway-mondido-checkout.php:189
+msgid "Enable/Disable"
+msgstr ""
+
+#: ../includes/class-wc-gateway-mondido-checkout.php:191
+msgid "Enable Mondido Checkout Module"
+msgstr ""
+
+#: ../includes/class-wc-gateway-mondido-checkout.php:195
+msgid "Title"
+msgstr ""
+
+#: ../includes/class-wc-gateway-mondido-checkout.php:197
+msgid "This controls the title which the user sees during checkout."
+msgstr ""
+
+#: ../includes/class-wc-gateway-mondido-checkout.php:201
+msgid "Description"
+msgstr ""
+
+#: ../includes/class-wc-gateway-mondido-checkout.php:203
+msgid "This controls the description which the user sees during checkout."
+msgstr ""
+
+#: ../includes/class-wc-gateway-mondido-checkout.php:207
+msgid "Merchant ID"
+msgstr ""
+
+#: ../includes/class-wc-gateway-mondido-checkout.php:209
+msgid "Merchant ID for Mondido"
+msgstr ""
+
+#: ../includes/class-wc-gateway-mondido-checkout.php:213
+msgid "Secret"
+msgstr ""
+
+#: ../includes/class-wc-gateway-mondido-checkout.php:215
+msgid "Given secret code from Mondido"
+msgstr ""
+
+#: ../includes/class-wc-gateway-mondido-checkout.php:219
+msgid "API Password"
+msgstr ""
+
+#: ../includes/class-wc-gateway-mondido-checkout.php:221
+msgid "API Password from Mondido"
+msgstr ""
+
+#: ../includes/class-wc-gateway-mondido-checkout.php:225
+msgid "Test Mode"
+msgstr ""
+
+#: ../includes/class-wc-gateway-mondido-checkout.php:227
+msgid "Set in testmode"
+msgstr ""
+
+#: ../includes/class-wc-gateway-mondido-checkout.php:231
+msgid "Authorize"
+msgstr ""
+
+#: ../includes/class-wc-gateway-mondido-checkout.php:233
+msgid "Reserve money, do not auto-capture"
+msgstr ""
+
+#: ../includes/class-wc-gateway-mondido-checkout.php:237
+msgid "Tax status for payment fees"
+msgstr ""
+
+#: ../includes/class-wc-gateway-mondido-checkout.php:240
+msgid "None"
+msgstr ""
+
+#: ../includes/class-wc-gateway-mondido-checkout.php:241
+msgid "Taxable"
+msgstr ""
+
+#: ../includes/class-wc-gateway-mondido-checkout.php:243
+msgid "If any payment fee should be taxable"
+msgstr ""
+
+#: ../includes/class-wc-gateway-mondido-checkout.php:247
+msgid "Tax class for payment fees"
+msgstr ""
+
+#: ../includes/class-wc-gateway-mondido-checkout.php:250
+msgid ""
+"If you have a fee for invoice payments, what tax class should be applied to "
+"that fee"
+msgstr ""
+
+#: ../includes/class-wc-gateway-mondido-checkout.php:254
+msgid "Logos"
+msgstr ""
+
+#: ../includes/class-wc-gateway-mondido-checkout.php:255
+msgid "Logos on checkout"
+msgstr ""
+
+#: ../includes/class-wc-gateway-mondido-checkout.php:258
+msgid "Visa"
+msgstr ""
+
+#: ../includes/class-wc-gateway-mondido-checkout.php:259
+msgid "MasterCard"
+msgstr ""
+
+#: ../includes/class-wc-gateway-mondido-checkout.php:260
+msgid "American Express"
+msgstr ""
+
+#: ../includes/class-wc-gateway-mondido-checkout.php:261
+msgid "Diners Club"
+msgstr ""
+
+#: ../includes/class-wc-gateway-mondido-checkout.php:262
+msgid "Direktbank"
+msgstr ""
+
+#: ../includes/class-wc-gateway-mondido-checkout.php:263
+msgid "Invoice/PartPayment"
+msgstr ""
+
+#: ../includes/class-wc-gateway-mondido-checkout.php:264
+msgid "PayPal"
+msgstr ""
+
+#: ../includes/class-wc-gateway-mondido-checkout.php:265
+msgid "MasterPass"
+msgstr ""
+
+#: ../includes/class-wc-gateway-mondido-checkout.php:266
+msgid "Swish"
+msgstr ""
+
+#: ../includes/class-wc-gateway-mondido-checkout.php:271
+msgid "Text for \"Place Order\" button"
+msgstr ""
+
+#: ../includes/class-wc-gateway-mondido-checkout.php:276
+#: ../includes/class-wc-gateway-mondido-checkout.php:278
+msgid "Checkout button on Cart page"
+msgstr ""
+
+#: ../includes/class-wc-gateway-mondido-checkout.php:282
+#: ../includes/class-wc-gateway-mondido-checkout.php:284
+msgid "Buy button on Product page"
+msgstr ""
+
+#: ../includes/class-wc-gateway-mondido-checkout.php:288
+#: ../includes/class-wc-gateway-mondido-checkout.php:290
+msgid "Mondido Checkout instead WooCommerce Checkout"
+msgstr ""
+
+#: ../includes/class-wc-gateway-mondido-checkout.php:357
+msgid "Checkout"
+msgstr ""
+
+#: ../includes/class-wc-gateway-mondido-checkout.php:459
+#, php-format
+msgid "Error: %s"
+msgstr ""
+
+#: ../woocommerce-gateway-mondido-checkout.php:71
+msgid ""
+"Required WooCommerce Mondido Payments Gateway plugin was automatically "
+"installed."
+msgstr ""
+
+#: ../woocommerce-gateway-mondido-checkout.php:97
+msgid "Settings"
+msgstr ""
