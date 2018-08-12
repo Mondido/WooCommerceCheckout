@@ -15,5 +15,5 @@ if ( ! defined( 'ABSPATH' ) ) {
         frameborder="0" scrolling="no" style="height: 860px; width: 100%;">
 </iframe>
 <script>
-    //iFrameResize( [], '#mondido-iframe' );
+    iFrameResize( [], '#mondido-iframe' );
 </script>
