@@ -3,10 +3,8 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 } // Exit if accessed directly
 
-$vendorsDir = dirname( __FILE__ ) . '/../vendors';
-
 if ( ! class_exists( '\\GuzzleHttp\\Client', FALSE ) ) {
-	require_once $vendorsDir . '/guzzle/vendor/autoload.php';
+	require_once dirname( __FILE__ ) . '/../vendors/guzzle/vendor/autoload.php';
 }
 
 class WC_Gateway_Mondido_Checkout extends WC_Gateway_Mondido_HW {
@@ -463,76 +461,35 @@ class WC_Gateway_Mondido_Checkout extends WC_Gateway_Mondido_HW {
 
         $fields = apply_filters( 'woocommerce_mondido_form_fields', $fields, $order, $this );
 
+        try {
+	        $client  = new GuzzleHttp\Client();
+	        $response = $client->request( 'POST', 'https://api.mondido.com/v1/transactions', array(
+		        'headers' => array(
+			        'Accept'        => 'application/json',
+			        'Authorization' => 'Basic ' . base64_encode( "{$this->merchant_id}:{$this->password}" )
+		        ),
+		        'json' => $fields,
+	        ) );
+	        $body = $response->getBody()->getContents();
+        } catch ( Exception $e ) {
+	        $message = $e->getMessage();
+	        if ( $e instanceof GuzzleHttp\Exception\ClientException ||
+	             $e instanceof GuzzleHttp\Exception\ServerException )
+	        {
+		        $message = $e->getResponse()->getBody()->getContents();
+	        }
 
-	    $container = [];
-	    $history = GuzzleHttp\Middleware::history($container);
-
-	    $stack = GuzzleHttp\HandlerStack::create();
-        // Add the history middleware to the handler stack.
-	    $stack->push($history);
-
-
-	    $client  = new GuzzleHttp\Client(['handler' => $stack]);
-	    $headers = array(
-		    //'Accept'        => 'application/json',
-		    'Authorization' => 'Basic ' . base64_encode( "{$this->merchant_id}:{$this->password}" )
-	    );
-
-	    $fp = fopen('php://temp', 'r+');
-	    $response = $client->request( 'POST', 'https://api.mondido.com/v1/transactions', array(
-		    //'body' => $fields,
-            'form_params' => $fields,
-		    'headers' => $headers,
-		    'debug' => $fp
-	    ) );
-	    fseek($fp, 0);
-
-	    file_put_contents(__DIR__ . '/logme1.txt', stream_get_contents($fp) . "\n---------------\n", FILE_APPEND);
-
-	    // Iterate over the requests and responses
-	    foreach ($container as $transaction) {
-	        $raw = (string) $transaction['request']->getBody(); // Hello World;
-	        file_put_contents(__DIR__ . '/logme.txt', $raw . "\n---------------\n", FILE_APPEND);
-	    }
-
-	    $body = $response->getBody()->getContents();
-
-	    $transaction = json_decode( $body, TRUE );
-
-
-        /* try {
-            $result = wp_remote_post( 'https://api.mondido.com/v1/transactions', array(
-                'method'  => 'POST',
-                'headers' => array(
-                    'Authorization' => 'Basic ' . base64_encode( "{$this->merchant_id}:{$this->password}" )
-                ),
-                'body' => $fields
-            ) );
-
-            if ( is_a( $result, 'WP_Error' ) ) {
-                throw new Exception( implode( $result->errors['http_request_failed'] ) );
-            }
-
-            if ( $result['response']['code'] != 200 ) {
-                $error = @json_decode( $result['body'], TRUE );
-                if ( is_array( $error ) && isset( $error['description'] ) ) {
-                    throw new Exception( $error['description'] );
-                }
-
-                throw new Exception( $result['body'] );
-            }
-        } catch (Exception $e) {
-            ?>
-            <ul class="woocommerce-error">
-                <li>
-                    <?php echo sprintf( __( 'Error: %s', 'woocommerce-gateway-mondido-checkout' ), $e->getMessage() ); ?>
-                </li>
-            </ul>
-            <?php
-            return;
+	        ?>
+	        <ul class="woocommerce-error">
+		        <li>
+			        <?php echo sprintf( __( 'Error: %s', 'woocommerce-gateway-mondido-checkout' ), $message ); ?>
+		        </li>
+	        </ul>
+	        <?php
+	        return;
         }
 
-        $transaction = json_decode( $result['body'], TRUE ); */
+	    $transaction = json_decode( $body, TRUE );
 
         wc_get_template(
             'checkout/mondido-iframe.php',
