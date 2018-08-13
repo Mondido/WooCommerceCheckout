@@ -3,6 +3,10 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 } // Exit if accessed directly
 
+if ( ! class_exists( '\\GuzzleHttp\\Client', FALSE ) ) {
+	require_once dirname( __FILE__ ) . '/../vendors/guzzle/vendor/autoload.php';
+}
+
 class WC_Gateway_Mondido_Checkout extends WC_Gateway_Mondido_HW {
     /**
      * Merchant Id
@@ -456,39 +460,36 @@ class WC_Gateway_Mondido_Checkout extends WC_Gateway_Mondido_HW {
         );
 
         $fields = apply_filters( 'woocommerce_mondido_form_fields', $fields, $order, $this );
+
         try {
-            $result = wp_remote_get( 'https://api.mondido.com/v1/transactions', array(
-                'method'  => 'POST',
-                'headers' => array(
-                    'Authorization' => 'Basic ' . base64_encode( "{$this->merchant_id}:{$this->password}" )
-                ),
-                'body' => $fields
-            ) );
+	        $client  = new GuzzleHttp\Client();
+	        $response = $client->request( 'POST', 'https://api.mondido.com/v1/transactions', array(
+		        'headers' => array(
+			        'Accept'        => 'application/json',
+			        'Authorization' => 'Basic ' . base64_encode( "{$this->merchant_id}:{$this->password}" )
+		        ),
+		        'json' => $fields,
+	        ) );
+	        $body = $response->getBody()->getContents();
+        } catch ( Exception $e ) {
+	        $message = $e->getMessage();
+	        if ( $e instanceof GuzzleHttp\Exception\ClientException ||
+	             $e instanceof GuzzleHttp\Exception\ServerException )
+	        {
+		        $message = $e->getResponse()->getBody()->getContents();
+	        }
 
-            if ( is_a( $result, 'WP_Error' ) ) {
-                throw new Exception( implode( $result->errors['http_request_failed'] ) );
-            }
-
-            if ( $result['response']['code'] != 200 ) {
-                $error = @json_decode( $result['body'], TRUE );
-                if ( is_array( $error ) && isset( $error['description'] ) ) {
-                    throw new Exception( $error['description'] );
-                }
-
-                throw new Exception( $result['body'] );
-            }
-        } catch (Exception $e) {
-            ?>
-            <ul class="woocommerce-error">
-                <li>
-                    <?php echo sprintf( __( 'Error: %s', 'woocommerce-gateway-mondido-checkout' ), $e->getMessage() ); ?>
-                </li>
-            </ul>
-            <?php
-            return;
+	        ?>
+	        <ul class="woocommerce-error">
+		        <li>
+			        <?php echo sprintf( __( 'Error: %s', 'woocommerce-gateway-mondido-checkout' ), $message ); ?>
+		        </li>
+	        </ul>
+	        <?php
+	        return;
         }
 
-        $transaction = json_decode( $result['body'], TRUE );
+	    $transaction = json_decode( $body, TRUE );
 
         wc_get_template(
             'checkout/mondido-iframe.php',
