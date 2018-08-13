@@ -3,6 +3,12 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 } // Exit if accessed directly
 
+$vendorsDir = dirname( __FILE__ ) . '/../vendors';
+
+if ( ! class_exists( '\\GuzzleHttp\\Client', FALSE ) ) {
+	require_once $vendorsDir . '/guzzle/vendor/autoload.php';
+}
+
 class WC_Gateway_Mondido_Checkout extends WC_Gateway_Mondido_HW {
     /**
      * Merchant Id
@@ -456,8 +462,46 @@ class WC_Gateway_Mondido_Checkout extends WC_Gateway_Mondido_HW {
         );
 
         $fields = apply_filters( 'woocommerce_mondido_form_fields', $fields, $order, $this );
-        try {
-            $result = wp_remote_get( 'https://api.mondido.com/v1/transactions', array(
+
+
+	    $container = [];
+	    $history = GuzzleHttp\Middleware::history($container);
+
+	    $stack = GuzzleHttp\HandlerStack::create();
+        // Add the history middleware to the handler stack.
+	    $stack->push($history);
+
+
+	    $client  = new GuzzleHttp\Client(['handler' => $stack]);
+	    $headers = array(
+		    //'Accept'        => 'application/json',
+		    'Authorization' => 'Basic ' . base64_encode( "{$this->merchant_id}:{$this->password}" )
+	    );
+
+	    $fp = fopen('php://temp', 'r+');
+	    $response = $client->request( 'POST', 'https://api.mondido.com/v1/transactions', array(
+		    //'body' => $fields,
+            'form_params' => $fields,
+		    'headers' => $headers,
+		    'debug' => $fp
+	    ) );
+	    fseek($fp, 0);
+
+	    file_put_contents(__DIR__ . '/logme1.txt', stream_get_contents($fp) . "\n---------------\n", FILE_APPEND);
+
+	    // Iterate over the requests and responses
+	    foreach ($container as $transaction) {
+	        $raw = (string) $transaction['request']->getBody(); // Hello World;
+	        file_put_contents(__DIR__ . '/logme.txt', $raw . "\n---------------\n", FILE_APPEND);
+	    }
+
+	    $body = $response->getBody()->getContents();
+
+	    $transaction = json_decode( $body, TRUE );
+
+
+        /* try {
+            $result = wp_remote_post( 'https://api.mondido.com/v1/transactions', array(
                 'method'  => 'POST',
                 'headers' => array(
                     'Authorization' => 'Basic ' . base64_encode( "{$this->merchant_id}:{$this->password}" )
@@ -488,7 +532,7 @@ class WC_Gateway_Mondido_Checkout extends WC_Gateway_Mondido_HW {
             return;
         }
 
-        $transaction = json_decode( $result['body'], TRUE );
+        $transaction = json_decode( $result['body'], TRUE ); */
 
         wc_get_template(
             'checkout/mondido-iframe.php',
