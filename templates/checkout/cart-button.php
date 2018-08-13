@@ -6,5 +6,5 @@ if ( ! defined( 'ABSPATH' ) ) {
 <a id="mondido-checkout-btn"
    href="#"
    class="checkout-button button alt wc-forward">
-	<?php _e( 'Proceed to Mondido Checkout', 'woocommerce-gateway-mondido' ); ?>
+	<?php _e( 'Proceed to Mondido Checkout', 'woocommerce-gateway-mondido-checkout' ); ?>
 </a>

@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     name="buy-mondido"
     value="<?php echo esc_html($product_id); ?>"
     class="single_add_to_cart_button button alt">
-    <?php _e( 'Buy now using Mondido Checkout', 'woocommerce-gateway-mondido' ); ?>
+    <?php _e( 'Buy now using Mondido Checkout', 'woocommerce-gateway-mondido-checkout' ); ?>
 </button>
 
 <script>
