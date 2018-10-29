@@ -3,10 +3,6 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 } // Exit if accessed directly
 
-if ( ! class_exists( '\\GuzzleHttp\\Client', FALSE ) ) {
-	require_once dirname( __FILE__ ) . '/../vendors/guzzle/vendor/autoload.php';
-}
-
 class WC_Gateway_Mondido_Checkout extends WC_Gateway_Mondido_HW {
     /**
      * Merchant Id
@@ -447,7 +443,7 @@ class WC_Gateway_Mondido_Checkout extends WC_Gateway_Mondido_HW {
             'vat_amount'   => 0,
             'merchant_id'  => $this->merchant_id,
             'currency'     => $order->get_currency(),
-            'customer_ref' => $order->get_user_id() != '0' ? $order->get_user_id() : '',
+            'customer_ref' => $this->getCustomerReference( $order ),
             'payment_ref'  => $order->get_id(),
             'success_url'  => add_query_arg( 'goto', $this->get_return_url( $order ), WC()->api_request_url( __CLASS__ ) ),
             'error_url'    => add_query_arg( 'goto', $order->get_cancel_order_url_raw(), WC()->api_request_url( __CLASS__ ) ),
@@ -462,22 +458,28 @@ class WC_Gateway_Mondido_Checkout extends WC_Gateway_Mondido_HW {
         $fields = apply_filters( 'woocommerce_mondido_form_fields', $fields, $order, $this );
 
         try {
-	        $client  = new GuzzleHttp\Client();
-	        $response = $client->request( 'POST', 'https://api.mondido.com/v1/transactions', array(
+	        $result = wp_remote_post( 'https://api.mondido.com/v1/transactions', array(
 		        'headers' => array(
-			        'Accept'        => 'application/json',
+			        'Content-Type' => 'application/json',
 			        'Authorization' => 'Basic ' . base64_encode( "{$this->merchant_id}:{$this->password}" )
 		        ),
-		        'json' => $fields,
+		        'body' => json_encode($fields),
 	        ) );
-	        $body = $response->getBody()->getContents();
+
+	        if ( is_a( $result, 'WP_Error' ) ) {
+		        throw new Exception( implode( $result->errors['http_request_failed'] ) );
+	        }
+
+	        if ( $result['response']['code'] != 200 ) {
+		        $error = @json_decode( $result['body'], TRUE );
+		        if ( is_array( $error ) && isset( $error['description'] ) ) {
+			        throw new Exception( $error['description'] );
+		        }
+
+		        throw new Exception( $result['body'] );
+	        }
         } catch ( Exception $e ) {
 	        $message = $e->getMessage();
-	        if ( $e instanceof GuzzleHttp\Exception\ClientException ||
-	             $e instanceof GuzzleHttp\Exception\ServerException )
-	        {
-		        $message = $e->getResponse()->getBody()->getContents();
-	        }
 
 	        ?>
 	        <ul class="woocommerce-error">
@@ -489,7 +491,7 @@ class WC_Gateway_Mondido_Checkout extends WC_Gateway_Mondido_HW {
 	        return;
         }
 
-	    $transaction = json_decode( $body, TRUE );
+	    $transaction = json_decode( $result['body'], TRUE );
 
         wc_get_template(
             'checkout/mondido-iframe.php',
