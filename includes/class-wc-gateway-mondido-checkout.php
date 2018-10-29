@@ -443,7 +443,7 @@ class WC_Gateway_Mondido_Checkout extends WC_Gateway_Mondido_HW {
             'vat_amount'   => 0,
             'merchant_id'  => $this->merchant_id,
             'currency'     => $order->get_currency(),
-            'customer_ref' => $order->get_user_id() != '0' ? $order->get_user_id() : '',
+            'customer_ref' => $this->getCustomerReference( $order ),
             'payment_ref'  => $order->get_id(),
             'success_url'  => add_query_arg( 'goto', $this->get_return_url( $order ), WC()->api_request_url( __CLASS__ ) ),
             'error_url'    => add_query_arg( 'goto', $order->get_cancel_order_url_raw(), WC()->api_request_url( __CLASS__ ) ),
@@ -456,39 +456,42 @@ class WC_Gateway_Mondido_Checkout extends WC_Gateway_Mondido_HW {
         );
 
         $fields = apply_filters( 'woocommerce_mondido_form_fields', $fields, $order, $this );
+
         try {
-            $result = wp_remote_get( 'https://api.mondido.com/v1/transactions', array(
-                'method'  => 'POST',
-                'headers' => array(
-                    'Authorization' => 'Basic ' . base64_encode( "{$this->merchant_id}:{$this->password}" )
-                ),
-                'body' => $fields
-            ) );
+	        $result = wp_remote_post( 'https://api.mondido.com/v1/transactions', array(
+		        'headers' => array(
+			        'Content-Type' => 'application/json',
+			        'Authorization' => 'Basic ' . base64_encode( "{$this->merchant_id}:{$this->password}" )
+		        ),
+		        'body' => json_encode($fields),
+	        ) );
 
-            if ( is_a( $result, 'WP_Error' ) ) {
-                throw new Exception( implode( $result->errors['http_request_failed'] ) );
-            }
+	        if ( is_a( $result, 'WP_Error' ) ) {
+		        throw new Exception( implode( $result->errors['http_request_failed'] ) );
+	        }
 
-            if ( $result['response']['code'] != 200 ) {
-                $error = @json_decode( $result['body'], TRUE );
-                if ( is_array( $error ) && isset( $error['description'] ) ) {
-                    throw new Exception( $error['description'] );
-                }
+	        if ( $result['response']['code'] != 200 ) {
+		        $error = @json_decode( $result['body'], TRUE );
+		        if ( is_array( $error ) && isset( $error['description'] ) ) {
+			        throw new Exception( $error['description'] );
+		        }
 
-                throw new Exception( $result['body'] );
-            }
-        } catch (Exception $e) {
-            ?>
-            <ul class="woocommerce-error">
-                <li>
-                    <?php echo sprintf( __( 'Error: %s', 'woocommerce-gateway-mondido-checkout' ), $e->getMessage() ); ?>
-                </li>
-            </ul>
-            <?php
-            return;
+		        throw new Exception( $result['body'] );
+	        }
+        } catch ( Exception $e ) {
+	        $message = $e->getMessage();
+
+	        ?>
+	        <ul class="woocommerce-error">
+		        <li>
+			        <?php echo sprintf( __( 'Error: %s', 'woocommerce-gateway-mondido-checkout' ), $message ); ?>
+		        </li>
+	        </ul>
+	        <?php
+	        return;
         }
 
-        $transaction = json_decode( $result['body'], TRUE );
+	    $transaction = json_decode( $result['body'], TRUE );
 
         wc_get_template(
             'checkout/mondido-iframe.php',
